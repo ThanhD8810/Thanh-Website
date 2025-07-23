@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Satoshi:wght@300;400;700&display=swap" />
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>Scitech-Extracurriculars</title>
+    <link href="css/satoshi.css" rel="stylesheet" />
+
+    <style type="text/css">
+        html {
+            scroll-behavior: smooth;
+            scroll-behavior: 2000ms;
+        }
+
+        body {
+            background: white;
+
+            margin: 0;
+            /* Remove default margin */
+            overflow-x: hidden;
+            /* Prevent horizontal scroll */
+        }
+
+        .box {
+            background-color: #f7f7f7;
+            height: 1px;
+            opacity: 0%;
+            margin-right: 15px;
+            width: 0px;
+            transition: all 1s ease-in-out;
+        }
+
+        .transform {
+            transition: all 1s ease-in-out;
+        }
+
+        .transform-active {
+            background-color: #FFFFE3;
+            height: 1px;
+            float: right;
+            width: clamp(1em, 55vw, 34em);
+            opacity: 100%;
+            transition: width opacity 1s ease-in-out;
+        }
+
+        #menu {
+            cursor: pointer;
+            width: 35px;
+            height: 40px;
+            margin: 40px 0 10px 20px;
+            float: right;
+            position: fixed;
+            transition: 1s;
+            top: -10px;
+            right: 30px;
+            z-index: 5;
+            color: #FFFFE3;
+            mix-blend-mode: difference;
+        }
+
+        .bar {
+            height: 5px;
+            width: 100%;
+            background-color: #FFFFE3;
+            mix-blend-mode: difference;
+            display: block;
+            transition: 0.3s ease;
+        }
+
+        #bar1 {
+            transform: translateY(-4px);
+        }
+
+        #bar3 {
+            transform: translateY(4px);
+        }
+
+        .nav {
+            position: fixed;
+            transition: opacity 1s ease;
+            right: 0px;
+            top: 60px;
+            color: #FFFFE3;
+            text-align: right;
+            display: none;
+            margin: 0 20px;
+            transition: 0.3s ease;
+            z-index: 5;
+            opacity: 0%;
+            max-height: 90vh;
+            /* Set the maximum height for the navigation bar */
+            overflow-y: auto;
+            /* Enable vertical scrolling when it exceeds the maximum height */
+            width: auto;
+        }
+
+        .nav li {
+            list-style: none;
+            padding-top: 5px;
+            padding-right: 15px;
+            padding-bottom: 5px;
+            z-index: 5;
+        }
+
+        .nav-text {
+            text-decoration: none;
+            color: #FFFFE3;
+            letter-spacing: 3px;
+            font-family: "Satoshi-Bold";
+            text-transform: uppercase;
+            font-size: clamp(1em, 3vw, 2em);
+            z-index: 5;
+        }
+
+        .change .bar {
+            background-color: #FFFFE3;
+        }
+
+        .change #bar1 {
+            transform: translateY(10px) rotateZ(-45deg);
+        }
+
+        .change #bar3 {
+            transform: translateX(0px) rotate(45deg);
+        }
+
+        .change #bar2 {
+            opacity: 0;
+        }
+
+        .change {
+            opacity: 100%;
+            transition: opacity 1s;
+            display: block;
+        }
+
+        #menu-bar {
+            z-index: 2;
+            margin-right: 0px;
+        }
+
+        .menu-bg {
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            opacity: 0%;
+            position: fixed;
+            transition: opacity 0.5s ease-in-out;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .change-bg {
+            opacity: 90%;
+            transition: opacity 1s ease-in-out;
+            z-index: 4;
+        }
+
+        .nav:has(.fancy:hover) .word:not(.fancy:hover) {
+            opacity: 0.5;
+        }
+
+        .word {
+            color: #FFFFE3;
+            transition: opacity 0.7s ease;
+        }
+
+        .logo {
+            font-size: 3em;
+            font-weight: 600;
+            text-transform: uppercase;
+            mix-blend-mode: difference;
+            letter-spacing: 7px;
+            color: #FFFFE3;
+            font-family: "Satoshi-Black";
+            position: fixed;
+            top: -50px;
+            left: 0;
+            z-index: 3;
+            padding-top: 15px;
+            padding-left: 30px;
+        }
+
+        @media screen and (max-width: 600px) {
+            .logo {
+                font-size: 1.5em;
+                padding-top: 35px;
+            }
+
+            #menu {
+                top: -22px;
+            }
+        }
+
+        .panel-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .panel-overlay {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0;
+            transition: all 0.3s ease-out;
+
+            object-fit: cover;
+        }
+
+        .panel-overlay:hover {
+            opacity: 1;
+            transition: all 0.3s ease-out;
+        }
+
+        .panel-text {
+            position: absolute;
+            width: 100%;
+            top: 46%;
+            height: 60px;
+            margin: 0 auto;
+            text-align: center;
+            bottom: 0;
+            z-index: 3;
+        }
+
+        .panel-title {
+            font-size: clamp(15px, 2vw, 18px);
+            font-family: "Satoshi-Light";
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: #FFFFE3;
+        }
+
+        .panel-vingette {
+            position: relative;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0.7;
+            background: black;
+        }
+
+        .panel-img {
+            position: absolute;
+            top: 0;
+            display: block;
+            min-width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            /* Add a border radius here, you can adjust the value (e.g., 10px) as needed */
+        }
+
+        .grid-wrapper .wide {
+            grid-column: span 2;
+        }
+
+        .grid-wrapper .tall {
+            grid-row: span 2;
+        }
+
+        .grid-wrapper .big {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        /* Main CSS */
+        .grid-wrapper>div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .grid-wrapper>div>img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            /* Add a border radius here, you can adjust the value (e.g., 10px) as needed */
+        }
+
+        .grid-wrapper {
+            display: grid;
+            z-index: 2;
+            position: relative;
+            top: 90vh;
+            grid-gap: 10px;
+            grid-template-columns: repeat(auto-fit,
+                    minmax(clamp(150px, 400px, 15vw), 1fr));
+            grid-auto-rows: clamp(200px, 400px, 10vw);
+            grid-auto-flow: dense;
+            max-width: 100vw;
+            /* Set the maximum width to 100vw */
+        }
+
+        .introduction-container {
+            height: 100vh;
+            /* Adjust based on content size */
+            display: flex;
+            position: relative;
+
+            flex-direction: column;
+            justify-content: center;
+            /* Centers vertically */
+            align-items: center;
+            /* Centers horizontally */
+            text-align: center;
+            /* Centers text inside */
+            background-color: black;
+        }
+
+        .typing-demo {
+            animation: typing 2.2s steps(30), blink 0.5s step-end infinite alternate;
+            white-space: nowrap;
+            overflow: hidden;
+            color: #FFFFE3;
+            border-right: 3px solid;
+            font-family: "Satoshi-Medium";
+            font-size: clamp(20px, 5vw, 91px);
+            width: clamp(8em,
+                    51vw,
+                    40em);
+            /* Ensure consistent width with introduction-text */
+        }
+
+        .introduction-text {
+            color: #FFFFE3;
+            text-transform: uppercase;
+            text-align: left;
+            font-family: "Satoshi-Light";
+            font-size: clamp(1em, 2vw, 2em);
+            width: clamp(8em, 51vw, 40em);
+            /* Match the width of typing-demo */
+            margin-top: 1em;
+            /* Space between typing-demo and introduction-text */
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                border-color: transparent;
+            }
+        }
+
+        .downArrowFilter {
+            filter: invert(100%) brightness(100%) contrast(100%);
+        }
+
+        .downArrow {
+            position: absolute;
+            align-items: center;
+            top: 85vh;
+            left: calc(50% - 25px);
+            /* Center the arrow based on its width */
+            z-index: 2;
+        }
+
+        .bounce {
+            animation: bounce 3s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-30px);
+            }
+
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .curtain {
+            /*  2 Contrasting Colors  */
+            background-image: linear-gradient(to bottom, black 50%, white 50%);
+            position: relative;
+            top: 70vh;
+            width: 100vw;
+        }
+
+        /* To extend till the bottom of the screen */
+        .curtain::after {
+            content: "";
+            display: block;
+            height: 160vh;
+        }
+
+        .invert {
+            /* Stick the div to the top */
+            position: sticky;
+            top: 0vw;
+
+            /* blend the differences */
+            mix-blend-mode: difference;
+
+            /* Center the content */
+            display: grid;
+            place-items: center;
+
+            /* Set the height of the child div */
+            height: 100vh;
+        }
+
+        h1 {
+            /** set the color of the text **/
+            color: #FFFFE3;
+            font-size: 7vw;
+            letter-spacing: 4px;
+            font-family: "Satoshi-bold";
+
+            font-weight: 600;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .hidden {
+            opacity: 0;
+            filter: blur(2px);
+            filter: saturation(0);
+            transition: all 1s ease-in-out;
+        }
+
+        .up {
+            transform: translateY(40%);
+        }
+
+        .down {
+            transform: translateY(-40%);
+        }
+
+        .right {
+            transform: translateX(-40%);
+        }
+
+        .left {
+            transform: translateX(40%);
+        }
+
+        .panel-move-up {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateY(0%);
+            transition: all 1s ease-in-out;
+        }
+
+        .panel-move-down {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateY(0%);
+            transition: all 1s ease-in-out;
+        }
+
+        .panel-move-right {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateX(0%);
+            transition: all 1s ease-in-out;
+        }
+
+        .panel-move-left {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateX(0%);
+            transition: all 1s ease-in-out;
+        }
+
+
+        .curtain {
+            /*  2 Contrasting Colors  */
+            background-image: linear-gradient(to bottom, black 50%, white 50%);
+            position: relative;
+            top: -25vh;
+            width: 100vw;
+        }
+
+        /* To extend till the bottom of the screen */
+        .curtain::after {
+            content: "";
+            display: block;
+            height: 160vh;
+
+        }
+
+        .invert {
+            /* Stick the div to the top */
+            position: sticky;
+            top: 0vw;
+
+            /* blend the differences */
+            mix-blend-mode: difference;
+
+            /* Center the content */
+            display: grid;
+            place-items: center;
+
+            /* Set the height of the child div */
+            height: 100vh;
+        }
+
+        .section-box {
+            background-color: #f1f1f1;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="menu-bar">
+        <div id="menu" onclick="onClickMenu()">
+            <div class="bar" id="bar1" viewBox="0 0 100 5">
+                <rect x="0" y="0" width="100" height="5" fill="black" />
+            </div>
+            <div class="bar" id="bar2" viewBox="0 0 100 5">
+                <rect x="0" y="0" width="100" height="5" fill="black" />
+            </div>
+            <div class="bar" id="bar3" viewBox="0 0 100 5">
+                <rect x="0" y="0" width="100" height="5" fill="black" />
+            </div>
+        </div>
+
+        <ul class="nav" id="nav">
+            <div class="word fancy">
+                <li><a href="index.html" class="word fancy nav-text">Home</a></li>
+                <div class="box transform"></div>
+            </div>
+
+            <div class="word fancy">
+                <li><a href="About.html" class="word fancy nav-text">About</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="#" class="word fancy nav-text">Contact</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li>
+                    <a href="Project.html" class="word fancy nav-text">Projects</a>
+                </li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Technology.html" class="word fancy nav-text">Technology</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Science.html" class="word fancy nav-text">Science</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li>
+                    <a href="Scitech-Extracurriculars.html" class="word fancy nav-text">SciTech Extracurriculars</a>
+                </li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Extracurriculars.html" class="word fancy nav-text">Extracurriculars</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Civics-Careers.html" class="word fancy nav-text">Careers</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="test.html" class="word fancy nav-text">Test</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Information.html" class="word fancy nav-text">Information</a></li>
+                <div class="box transform"></div>
+            </div>
+        </ul>
+    </div>
+
+    <div class="menu-bg" id="menu-bg"></div>
+
+    <a href="index.html">
+        <p class="logo">Thanh Diep</p>
+    </a>
+
+    <div class="introduction-container">
+        <div class="typing-demo">Hi, my name is Thanh.</div>
+        <p class="introduction-text hidden up" data-direction="up">
+            I believe that SciTech extracurriculars are important because they give students hands-on experience with
+            real-world technology and engineering challenges, helping them develop critical thinking, teamwork, and
+            problem-solving skills that go beyond the classroom and prepare them for future STEM careers.
+        </p>
+    </div>
+
+    <div class="curtain">
+        <div class="invert">
+            <h1>Scitech<br>Extracurriculars</h1>
+        </div>
+    </div>
+
+    <section style="background: white; padding: 80px 20px; font-family: 'Satoshi', sans-serif;">
+        <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 80px;">
+
+            <!-- Grade 9 Section -->
+            <div class="hidden left section-box" style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px;"
+                data-direction="left">
+
+                <div style="flex: 1 1 400px; color: black;">
+                    <h2>📘 Grade 9 — Mr Knowles' Grade 9 Coding Club</h2>
+                    <p>This was my first experience with programming outside of the classroom. We used Unity and C# to
+                        build both 2D and 3D games, and my biggest accomplishment that year was developing a 3D car
+                        driving simulator. It was a fully navigable terrain with realistic road textures and vehicle
+                        physics. I worked hard to understand how to script acceleration, camera angles, and turning
+                        mechanics. The learning curve was steep, especially in writing scripts that made the car behave
+                        properly and react to input smoothly, but I loved it.
+                        Creating the simulator taught me the value of trial and error, how to use object hierarchies in
+                        Unity, and how to debug in real time. Watching a virtual car drive across a map that I built
+                        from scratch made me realize how powerful code can be. This experience gave me confidence and
+                        solidified my interest in computer-aided engineering and software development.
+                    </p>
+
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <img src="images/CarGame.mov" alt="Grade 12 Image"
+                        style="border-radius: 16px; width: 80%; max-width: 500px; transform: rotate(0deg);" />
+
+                </div>
+            </div>
+
+            <!-- Grade 10 Section -->
+            <div class="hidden right section-box"
+                style="display: flex; flex-wrap: wrap-reverse; align-items: center; gap: 40px;" data-direction="right">
+                <div style="flex: 1 1 400px;color: black;">
+                    <h2>📙 Grade 10 — Coding Club (Year 2)</h2>
+                    <p>This year we advanced into object-oriented programming, web development, and Python-based
+                        projects. I helped newer members with syntax and logic flow, and for my own learning, I dove
+                        into building websites from scratch. One of my proudest achievements was creating my first Tesla
+                        clone website using HTML, CSS, and JavaScript.
+                        The site mimicked Tesla's sleek UI design and had smooth scrolling sections, animated car
+                        images, and responsive layouts. I learned how to structure a webpage, link stylesheets and
+                        scripts, and use modern development tools like GitHub for version control. It was the first time
+                        I felt like I had the tools to bring professional-looking ideas to life.
+                        To document my work, I took a screenshot of the Tesla clone homepage I built, showcasing the
+                        Roadster with clean navigation and interactive components. [See screenshot below.]
+                        This experience pushed me to think creatively about user interface and user experience, and made
+                        me excited about the possibilities of front-end engineering. It also laid the foundation for
+                        future tech projects in design and web development.
+                        I helped newer members with syntax and logic flow, and for my own learning, I dove into building
+                        websites from scratch. One of my proudest achievements was creating my first Tesla clone website
+                        using HTML, CSS, and JavaScript.
+                        The site mimicked Tesla's sleek UI design and had smooth scrolling sections, animated car
+                        images, and responsive layouts. I learned how to structure a webpage, link stylesheets and
+                        scripts, and use modern development tools like GitHub for version control. It was the first time
+                        I felt like I had the tools to bring professional-looking ideas to life.
+                        This experience pushed me to think creatively about user interface and user experience, and made
+                        me excited about the possibilities of front-end engineering. It also laid the foundation for
+                        future tech projects in design and web development.. I helped newer members with syntax and
+                        logic flow. Teaching others improved my own understanding and gave me the confidence to start my
+                        own side projects.
+                    </p>
+
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <img src="images/Screenshot 2025-05-28 at 9.30.32 AM.png" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 500px;" />
+                    <img src="images/Screenshot 2025-05-28 at 9.39.22 AM.png" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 500px;" />
+
+                </div>
+
+            </div>
+
+            <!-- Grade 11 Section -->
+            <div class="hidden up section-box" style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px;"
+                data-direction="up">
+                <img src="images/knowmore.jpeg" alt="Grade 11 Image"
+                    style="flex: 1 1 400px; border-radius: 16px; width: 100%; max-width: 500px;" />
+                <div style="flex: 1 1 400px; color: black;">
+                    <h2>📕 Grade 11 — Knowmore Hacks
+                    </h2>
+                    <p>The best part was seeing other students succeed with my guidance—it was very fulfilling. The
+                        hardest part was explaining complex ideas in simple terms. I chose to mentor at this event
+                        because I wanted to test my knowledge and help others in their learning journey. I gained
+                        insights into how teaching is also a form of learning. I also developed better interpersonal and
+                        troubleshooting skills, which are crucial in both tech and real-world team environments. I
+                        contributed to the development of teh website, giving design tips to the seniors who were on the
+                        team as well(Aidden and Jeff)
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- Grade 12 Section -->
+            <div class="hidden right section-box"
+                style="display: flex; flex-wrap: wrap-reverse; align-items: center; gap: 40px;" data-direction="right">
+                <div style="flex: 1 1 400px; color: black;">
+                    <h2>📗 Grade 12 — STEM Student Association</h2>
+                    <p>In just 30 minutes, my friends and I built a popsicle stick bridge during a timed STEM Student
+                        Association competition. Despite the rushed design and limited materials, our bridge ended up
+                        being the strongest of all entries and—according to the very unbiased judges—also the best
+                        looking.
+
+                        What I enjoyed the most was the spontaneous teamwork and laughter as we scrambled to put the
+                        structure together. It was one of those moments where creativity and problem-solving came
+                        together under pressure.
+
+                        The biggest challenge was working against the clock with fragile materials. It forced us to
+                        think fast, compromise on aesthetics and structure, and trust each other’s instincts.
+
+                        I chose to participate because it combined competition with hands-on engineering, which is the
+                        heart of what I love about STEM.
+
+                        The biggest takeaway was that even a “sketchy” idea can succeed with the right execution and
+                        collaboration. It reminded me that sometimes the best solutions aren’t the prettiest on
+                        paper—they’re the ones that simply work.</p>
+
+                    <h2>📗 Grade 12 — Coding Club (Year 4)</h2>
+                    <p>One of the most memorable projects that I have made in my last year of coding club was Snake
+                        Game. The
+                        most enjoyable part of this project was bringing the classic Snake game to life using just Java.
+                        Watching it go from a static grid to a fully functional, interactive game—where the snake could
+                        move, eat apples, grow, and even die—was incredibly satisfying. It felt like real progress each
+                        time a new feature worked.
+
+
+                        The most difficult part was implementing the logic to check for self-collision and managing file
+                        I/O for saving and retrieving the high score. Parsing a text file to compare scores line by line
+                        took time to figure out, and debugging input validation with try-catch blocks was tricky at
+                        first.
+
+
+                        I chose this project because Snake is a simple yet timeless game that’s perfect for learning
+                        game logic, object movement, and condition handling. It was also a chance to challenge myself by
+                        building something more advanced than the usual console programs.
+
+
+                        I learned how important structure and planning are when building a game. From managing snake
+                        movement and direction, to drawing and refreshing the screen, to handling user input and saving
+                        scores—every part taught me how to write clean, logical, and efficient Java code. It also
+                        reminded me that breaking a big task into smaller parts makes even the hardest challenges
+                        manageable.</p>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <img src="images/IMG_5937.jpeg" alt="Grade 12 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 500px;" />
+                    <img src="images/snakeGame6.mov" alt="Grade 12 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 500px;" />
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        function onClickMenu() {
+            document.getElementById("menu").classList.toggle("change");
+            document.getElementById("nav").classList.toggle("change");
+            document.getElementById("menu-bg").classList.toggle("change-bg");
+        }
+
+        $("#menu").click(function () {
+            $(".transform").toggleClass("transform-active");
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const panel = entry.target;
+                    const direction = panel.getAttribute("data-direction");
+                    panel.classList.remove("hidden"); // Remove the hidden class
+                    panel.classList.add(`panel-move-${direction}`); // Add the animation class
+                    observer.unobserve(panel); // Remove observer for this panel
+                }
+            });
+        });
+
+        const hiddenElements = document.querySelectorAll(".hidden");
+        hiddenElements.forEach((el) => {
+            observer.observe(el); // Start observing hidden panels
+        });
+
+        smoothScroll.init();
+    </script>
+</body>
+
+</html>

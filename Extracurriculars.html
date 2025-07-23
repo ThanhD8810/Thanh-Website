@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Satoshi:wght@300;400;700&display=swap" />
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>Extracurriculars</title>
+    <link href="css/satoshi.css" rel="stylesheet" />
+
+    <style type="text/css">
+        html {
+            scroll-behavior: smooth;
+            scroll-behavior: 2000ms;
+        }
+
+        body {
+            background: white;
+
+            margin: 0;
+            /* Remove default margin */
+            overflow-x: hidden;
+            /* Prevent horizontal scroll */
+        }
+
+        .box {
+            background-color: #f7f7f7;
+            height: 1px;
+            opacity: 0%;
+            margin-right: 15px;
+            width: 0px;
+            transition: all 1s ease-in-out;
+        }
+
+        .transform {
+            transition: all 1s ease-in-out;
+        }
+
+        .transform-active {
+            background-color: #FFFFE3;
+            height: 1px;
+            float: right;
+            width: clamp(1em, 55vw, 34em);
+            opacity: 100%;
+            transition: width opacity 1s ease-in-out;
+        }
+
+        #menu {
+            cursor: pointer;
+            width: 35px;
+            height: 40px;
+            margin: 40px 0 10px 20px;
+            float: right;
+            position: fixed;
+            transition: 1s;
+            top: -10px;
+            right: 30px;
+            z-index: 5;
+            color: #FFFFE3;
+            mix-blend-mode: difference;
+        }
+
+        .bar {
+            height: 5px;
+            width: 100%;
+            background-color: #FFFFE3;
+            mix-blend-mode: difference;
+            display: block;
+            transition: 0.3s ease;
+        }
+
+        #bar1 {
+            transform: translateY(-4px);
+        }
+
+        #bar3 {
+            transform: translateY(4px);
+        }
+
+        .nav {
+            position: fixed;
+            transition: opacity 1s ease;
+            right: 0px;
+            top: 60px;
+            color: #FFFFE3;
+            text-align: right;
+            display: none;
+            margin: 0 20px;
+            transition: 0.3s ease;
+            z-index: 5;
+            opacity: 0%;
+            max-height: 90vh;
+            /* Set the maximum height for the navigation bar */
+            overflow-y: auto;
+            /* Enable vertical scrolling when it exceeds the maximum height */
+            width: auto;
+        }
+
+        .nav li {
+            list-style: none;
+            padding-top: 5px;
+            padding-right: 15px;
+            padding-bottom: 5px;
+            z-index: 5;
+        }
+
+        .nav-text {
+            text-decoration: none;
+            color: #FFFFE3;
+            letter-spacing: 3px;
+            font-family: "Satoshi-Bold";
+            text-transform: uppercase;
+            font-size: clamp(1em, 3vw, 2em);
+            z-index: 5;
+        }
+
+        .change .bar {
+            background-color: #FFFFE3;
+        }
+
+        .change #bar1 {
+            transform: translateY(10px) rotateZ(-45deg);
+        }
+
+        .change #bar3 {
+            transform: translateX(0px) rotate(45deg);
+        }
+
+        .change #bar2 {
+            opacity: 0;
+        }
+
+        .change {
+            opacity: 100%;
+            transition: opacity 1s;
+            display: block;
+        }
+
+        #menu-bar {
+            z-index: 2;
+            margin-right: 0px;
+        }
+
+        .menu-bg {
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            opacity: 0%;
+            position: fixed;
+            transition: opacity 0.5s ease-in-out;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .change-bg {
+            opacity: 90%;
+            transition: opacity 1s ease-in-out;
+            z-index: 4;
+        }
+
+        .nav:has(.fancy:hover) .word:not(.fancy:hover) {
+            opacity: 0.5;
+        }
+
+        .word {
+            color: #FFFFE3;
+            transition: opacity 0.7s ease;
+        }
+
+        .logo {
+            font-size: 3em;
+            font-weight: 600;
+            text-transform: uppercase;
+            mix-blend-mode: difference;
+            letter-spacing: 7px;
+            color: #FFFFE3;
+            font-family: "Satoshi-Black";
+            position: fixed;
+            top: -50px;
+            left: 0;
+            z-index: 3;
+            padding-top: 15px;
+            padding-left: 30px;
+        }
+
+        @media screen and (max-width: 600px) {
+            .logo {
+                font-size: 1.5em;
+                padding-top: 35px;
+            }
+
+            #menu {
+                top: -22px;
+            }
+        }
+
+        .panel-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .panel-overlay {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0;
+            transition: all 0.3s ease-out;
+
+            object-fit: cover;
+        }
+
+        .panel-overlay:hover {
+            opacity: 1;
+            transition: all 0.3s ease-out;
+        }
+
+        .panel-text {
+            position: absolute;
+            width: 100%;
+            top: 46%;
+            height: 60px;
+            margin: 0 auto;
+            text-align: center;
+            bottom: 0;
+            z-index: 3;
+        }
+
+        .panel-title {
+            font-size: clamp(15px, 2vw, 18px);
+            font-family: "Satoshi-Light";
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: #FFFFE3;
+        }
+
+        .panel-vingette {
+            position: relative;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0.7;
+            background: black;
+        }
+
+        .panel-img {
+            position: absolute;
+            top: 0;
+            display: block;
+            min-width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            /* Add a border radius here, you can adjust the value (e.g., 10px) as needed */
+        }
+
+        .grid-wrapper .wide {
+            grid-column: span 2;
+        }
+
+        .grid-wrapper .tall {
+            grid-row: span 2;
+        }
+
+        .grid-wrapper .big {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        /* Main CSS */
+        .grid-wrapper>div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .grid-wrapper>div>img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            /* Add a border radius here, you can adjust the value (e.g., 10px) as needed */
+        }
+
+        .grid-wrapper {
+            display: grid;
+            z-index: 2;
+            position: relative;
+            top: 90vh;
+            grid-gap: 10px;
+            grid-template-columns: repeat(auto-fit,
+                    minmax(clamp(150px, 400px, 15vw), 1fr));
+            grid-auto-rows: clamp(200px, 400px, 10vw);
+            grid-auto-flow: dense;
+            max-width: 100vw;
+            /* Set the maximum width to 100vw */
+        }
+
+        .introduction-container {
+            height: 100vh;
+            /* Adjust based on content size */
+            display: flex;
+            position: relative;
+
+            flex-direction: column;
+            justify-content: center;
+            /* Centers vertically */
+            align-items: center;
+            /* Centers horizontally */
+            text-align: center;
+            /* Centers text inside */
+            background-color: black;
+        }
+
+        .typing-demo {
+            animation: typing 2.2s steps(30), blink 0.5s step-end infinite alternate;
+            white-space: nowrap;
+            overflow: hidden;
+            color: #FFFFE3;
+            border-right: 3px solid;
+            font-family: "Satoshi-Medium";
+            font-size: clamp(20px, 5vw, 91px);
+            width: clamp(8em,
+                    51vw,
+                    40em);
+            /* Ensure consistent width with introduction-text */
+        }
+
+        .introduction-text {
+            color: #FFFFE3;
+            text-transform: uppercase;
+            text-align: left;
+            font-family: "Satoshi-Light";
+            font-size: clamp(1em, 2vw, 2em);
+            width: clamp(8em, 51vw, 40em);
+            /* Match the width of typing-demo */
+            margin-top: 1em;
+            /* Space between typing-demo and introduction-text */
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                border-color: transparent;
+            }
+        }
+
+        .downArrowFilter {
+            filter: invert(100%) brightness(100%) contrast(100%);
+        }
+
+        .downArrow {
+            position: absolute;
+            align-items: center;
+            top: 85vh;
+            left: calc(50% - 25px);
+            /* Center the arrow based on its width */
+            z-index: 2;
+        }
+
+        .bounce {
+            animation: bounce 3s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-30px);
+            }
+
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .curtain {
+            /*  2 Contrasting Colors  */
+            background-image: linear-gradient(to bottom, black 50%, white 50%);
+            position: relative;
+            top: 70vh;
+            width: 100vw;
+        }
+
+        /* To extend till the bottom of the screen */
+        .curtain::after {
+            content: "";
+            display: block;
+            height: 160vh;
+        }
+
+        .invert {
+            /* Stick the div to the top */
+            position: sticky;
+            top: 0vw;
+
+            /* blend the differences */
+            mix-blend-mode: difference;
+
+            /* Center the content */
+            display: grid;
+            place-items: center;
+
+            /* Set the height of the child div */
+            height: 100vh;
+        }
+
+        h1 {
+            /** set the color of the text **/
+            color: #FFFFE3;
+            font-size: 6.5vw;
+            letter-spacing: 4px;
+            font-family: "Satoshi-bold";
+
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .hidden {
+            opacity: 0;
+            filter: blur(2px);
+            filter: saturation(0);
+            transition: all 1s ease-in-out;
+        }
+
+        .up {
+            transform: translateY(40%);
+        }
+
+        .down {
+            transform: translateY(-40%);
+        }
+
+        .right {
+            transform: translateX(-40%);
+        }
+
+        .left {
+            transform: translateX(40%);
+        }
+
+        .panel-move-up {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateY(0%);
+            transition: all 1s ease-in-out;
+        }
+
+        .panel-move-down {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateY(0%);
+            transition: all 1s ease-in-out;
+        }
+
+        .panel-move-right {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateX(0%);
+            transition: all 1s ease-in-out;
+        }
+
+        .panel-move-left {
+            filter: blur(0px);
+            filter: saturation(1);
+            transform: translateX(0%);
+            transition: all 1s ease-in-out;
+        }
+
+
+        .curtain {
+            /*  2 Contrasting Colors  */
+            background-image: linear-gradient(to bottom, black 50%, white 50%);
+            position: relative;
+            top: -25vh;
+            width: 100vw;
+        }
+
+        /* To extend till the bottom of the screen */
+        .curtain::after {
+            content: "";
+            display: block;
+            height: 160vh;
+
+        }
+
+        .invert {
+            /* Stick the div to the top */
+            position: sticky;
+            top: 0vw;
+
+            /* blend the differences */
+            mix-blend-mode: difference;
+
+            /* Center the content */
+            display: grid;
+            place-items: center;
+
+            /* Set the height of the child div */
+            height: 100vh;
+        }
+
+        .section-box {
+            background-color: #f1f1f1;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="menu-bar">
+        <div id="menu" onclick="onClickMenu()">
+            <div class="bar" id="bar1" viewBox="0 0 100 5">
+                <rect x="0" y="0" width="100" height="5" fill="black" />
+            </div>
+            <div class="bar" id="bar2" viewBox="0 0 100 5">
+                <rect x="0" y="0" width="100" height="5" fill="black" />
+            </div>
+            <div class="bar" id="bar3" viewBox="0 0 100 5">
+                <rect x="0" y="0" width="100" height="5" fill="black" />
+            </div>
+        </div>
+
+        <ul class="nav" id="nav">
+            <div class="word fancy">
+                <li><a href="index.html" class="word fancy nav-text">Home</a></li>
+                <div class="box transform"></div>
+            </div>
+
+            <div class="word fancy">
+                <li><a href="About.html" class="word fancy nav-text">About</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="#" class="word fancy nav-text">Contact</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li>
+                    <a href="Project.html" class="word fancy nav-text">Projects</a>
+                </li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Technology.html" class="word fancy nav-text">Technology</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Science.html" class="word fancy nav-text">Science</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li>
+                    <a href="Scitech-Extracurriculars.html" class="word fancy nav-text">SciTech Extracurriculars</a>
+                </li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Extracurriculars.html" class="word fancy nav-text">Extracurriculars</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Civics-Careers.html" class="word fancy nav-text">Careers</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="test.html" class="word fancy nav-text">Tests</a></li>
+                <div class="box transform"></div>
+            </div>
+            <div class="word fancy">
+                <li><a href="Information.html" class="word fancy nav-text">Information</a></li>
+                <div class="box transform"></div>
+            </div>
+        </ul>
+    </div>
+
+    <div class="menu-bg" id="menu-bg"></div>
+
+    <a href="index.html">
+        <p class="logo">Thanh Diep</p>
+    </a>
+
+    <div class="introduction-container">
+        <div class="typing-demo">Hi, my name is Thanh.</div>
+        <p class="introduction-text hidden up" data-direction="up">
+            Extracurriculars are important because they help you grow beyond the classroom by building real-world skills
+            like leadership, teamwork, and problem-solving, while also showing universities and employers that you’re
+            motivated, well-rounded, and capable of balancing multiple responsibilities.
+        </p>
+    </div>
+
+    <div class="curtain">
+        <div class="invert">
+            <h1>Extracurriculars</h1>
+        </div>
+    </div>
+
+    <section style="background: white; padding: 80px 20px; font-family: 'Satoshi', sans-serif;">
+        <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 80px;">
+
+            <!-- Grade 9 Section -->
+            <div class="hidden left section-box" style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px;"
+                data-direction="left">
+
+                <div style="flex: 1 1 400px; color: black;">
+                    <h2>📘 Grade 9 — Kenollie Summer BBQ</h2>
+                    <p>For some reason a kid who was afraid of napkins was clinging onto me. He would follow me
+                        around and help me with the stations I was running, It was a bit unusual. What I enjoyed the
+                        most was being part of an event that brought the whole community together. There was something
+                        special about seeing families and students enjoying the fair, knowing I played a role in making
+                        it all happen—whether through prepping food, managing the BBQ, or handing out meals with a
+                        smile.
+
+                        The most challenging part was definitely the rush hour. The lineups grew fast, and keeping up
+                        with orders while staying organized and calm under pressure was no small task. Coordinating with
+                        other volunteers in a fast-paced environment pushed me to think quickly and act efficiently.
+
+                        I chose to volunteer at the Fall Fair because I wanted to give back to my old elementary school
+                        in a meaningful way. It was an opportunity to reconnect with a place that shaped my early years
+                        and contribute to something fun and positive.
+
+                        Through this experience, I gained a better appreciation for teamwork and communication. Even
+                        what seemed like a simple task required coordination, time management, and adaptability. It
+                        taught me that being reliable in high-pressure situations—no matter how small the role—can make
+                        a big impact on group success.
+                    </p>
+
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <img src="images/kenollie.jpeg" alt="Grade 12 Image"
+                        style="border-radius: 16px; width: 80%; max-width: 500px; transform: rotate(0);" />
+
+                </div>
+            </div>
+
+            <!-- Grade 10 Section -->
+            <div class="hidden right section-box"
+                style="display: flex; flex-wrap: wrap-reverse; align-items: center; gap: 40px;" data-direction="right">
+                <div style="flex: 1 1 400px;color: black;">
+                    <h2>📙 Grade 10 — Lacrosse and Badminton
+                    </h2>
+                    <p>In Grade 10, I took a leap and joined the lacrosse team—even though I had never played before.
+                        After stepping away from hockey in Grade 8, I was looking for a new sport that would push me. I
+                        spent countless early mornings practicing my stick handling, shooting, and learning the rules.
+                        All that training paid off when I scored my first goal of the season. It was an unforgettable
+                        moment and a proud milestone, showing me that consistent effort leads to success. We won tier
+                        two lacrosse!<br><br>
+
+                        In badminton, my partner Rachel and I had an incredible run at the South East Peel tournament.
+                        We advanced to the finals after winning 3 out of 4 games. Sadly, Rachel dislocated her shoulder
+                        during our second game and we had to forfeit the final match. I was proud of her for pushing
+                        through two games but eventually had reached her limit. Even so, we finished third overall,
+                        and I was proud of what we accomplished together. Both of these experiences taught me
+                        resilience, adaptability, and the importance of preparation and teamwork. Maybe Next year we
+                        will do better.
+                    </p>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <img src="images/lacrosse10.jpeg" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+                    <img src="images/badminton10.jpeg" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+
+
+                </div>
+
+            </div>
+
+            <!-- Grade 11 Section -->
+            <div class="hidden up section-box" style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px;"
+                data-direction="up">
+
+                <div style="flex: 1 1 300px; color: black;">
+                    <h2>📕 Grade 11 — Athletic Council Intarmural Executive</h2>
+                    <p>
+                        Serving as an Intramural Executive on the Athletic Council was an incredibly meaningful
+                        experience that allowed me to grow as both a leader and a team player. It gave me the chance to
+                        contribute to the positive energy in the school by helping to organize and run sports
+                        tournaments that brought students together across all grades.
+
+
+                        I enjoyed seeing the school come alive during intramural events—the cheers, the friendly
+                        rivalries, and the sense of unity they created. Knowing that I helped make those moments
+                        possible made the effort worth it. It was especially rewarding to watch students who normally
+                        don’t participate in competitive sports come out, have fun, and feel included.
+
+
+                        One of the biggest challenges was dealing with last-minute schedule changes and managing
+                        conflicts between teams. Coordinating gym availability, referees, and ensuring fair play
+                        required strong communication and quick problem-solving. It taught me how to stay calm under
+                        pressure and work with others to find solutions on the fly.
+
+
+                        I chose to take on this role because I’ve always been passionate about sports and school spirit.
+                        I wanted to give back to the school community and create opportunities for others to experience
+                        the same joy I’ve found in physical activity and teamwork.
+
+
+                        This experience taught me that leadership isn’t always about being in the spotlight—it’s often
+                        about working behind the scenes to make sure things run smoothly. I learned how to manage
+                        responsibilities, collaborate with others, and adapt to unexpected challenges. Most importantly,
+                        I gained a deeper appreciation for the power of community and inclusion in school life.
+                    </p>
+                    <h2>📕 Grade 11 — Junior Aquatic Instructor</h2>
+                    <p>
+                        Volunteering as a Junior Aquatic Instructor at Huron Park was one of the most transformative
+                        experiences of my high school years. It gave me the chance to combine my love for swimming with
+                        my passion for helping others. From toddlers taking their first steps into the water to adults
+                        overcoming deep-seated fears, each class offered something new and meaningful.
+
+
+                        What I enjoyed most was the variety. Every day was different—one moment I’d be making games out
+                        of flutter kicks with preschoolers, and the next I’d be guiding an older adult through gentle
+                        aquatic exercises. Helping someone float for the first time or seeing a child finally swim
+                        across the shallow end without a flutter board were moments that filled me with pride. Watching
+                        people grow more confident in the water—and in themselves—was incredibly rewarding.
+
+
+                        The most challenging part was working with individuals who had hydrophobia or physical
+                        limitations. It required a lot of patience, empathy, and creativity. I had to adapt my
+                        communication and teaching styles to help each person feel safe and supported. For example, I
+                        worked with a young child who was terrified of putting their face in the water. We spent several
+                        classes just splashing and playing near the edge until they finally felt brave enough to try on
+                        their own. Moments like that reminded me how small steps can lead to big breakthroughs.
+
+
+                        I chose to volunteer as a Junior Aquatic Instructor because swimming has always been a big part
+                        of my life. I wanted to give back to the community by helping others develop water safety skills
+                        and discover the joy of swimming. Huron Park was the perfect environment—it felt like a second
+                        home and offered a diverse range of students, which made the experience even more enriching.
+
+
+                        This experience taught me the importance of patience, adaptability, and clear communication. It
+                        showed me that effective teaching isn’t one-size-fits-all—it’s about understanding who you’re
+                        teaching and meeting them where they are. I also gained a deep respect for instructors and the
+                        impact they have on building confidence and life skills. Above all, I learned that progress
+                        looks different for everyone, and that even the smallest victories in the pool can mean the
+                        world to someone.</p>
+
+                    <h2>📕 Grade 11 — Varisty Badminton Team (Year 2)</h2>
+                    <p>
+                        This year, my partner Naya and I reached the semi finals of our region but unfortunately fell to
+                        Glenforest. What I enjoyed the most was the rush of competing—especially the feeling of progress
+                        after intense practice. Reaching the Southeast of Peel Division finals and qualifying with a
+                        partner I had only trained with for two weeks was unforgettable.
+
+                        The most challenging part was dealing with instability. From having to partner with five
+                        different teammates to overcoming a serious shoulder injury, I had to adapt constantly. Each new
+                        partner required a shift in playstyle, communication, and trust-building.
+
+                        I chose badminton because it’s both strategic and physical. I’ve always appreciated how it
+                        pushes you to think while staying fast on your feet. The sport also provided an outlet for
+                        stress and a space to grow my competitive edge.
+
+                        The experience taught me perseverance and flexibility. I learned that success isn’t always about
+                        having the perfect setup—it’s about making the best of the situation and staying committed to
+                        your goals no matter how chaotic things get. I will train harder next year to at least qualify
+                        for ropssaa.</p>
+
+                    <h2>📕 Grade 11 — Varsity Lacrosse Team (Year 2)</h2>
+                    <p>What I enjoyed the most during my second year of lacrosse was stepping into a leadership role and
+                        becoming a mentor to new players. I took pride in guiding rookies through drills, offering
+                        advice during practices, and helping them build confidence—just as I once needed when I was new.
+                        Contributing to the team’s development, both on and off the field, made every practice and game
+                        more meaningful.
+
+                        The most challenging part was adapting to the increased responsibility and expectations that
+                        came with being a returning player. I was no longer just trying to keep up—I had to set the
+                        pace, keep the energy high, and be a reliable presence when the team faced tough moments during
+                        the season. It wasn’t just about my own performance anymore—it was about making sure the whole
+                        team moved forward together.
+
+                        I chose to stick with lacrosse because I saw how much it had transformed me in just one year. I
+                        wanted to keep pushing myself athletically, but more importantly, I wanted to give back to the
+                        team that had helped me grow. I knew I had more to contribute, not just as a player, but as
+                        someone others could count on.
+
+                        This second-year experience taught me that leadership is earned through consistency, effort, and
+                        empathy. It reinforced the importance of teamwork, communication, and composure under pressure.
+                        Most of all, it showed me that the true value of sports lies not just in the wins, but in the
+                        relationships you build and the growth you inspire in others.</p>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <img src="images/intramural.jpeg" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+                    <img src="images/volunteer.jpeg" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+                    <img src="images/IMG_7319.PNG" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+                    <img src="images/lacrosse11.jpeg" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+
+
+                </div>
+            </div>
+
+            <!-- Grade 12 Section -->
+            <div class="hidden up section-box" style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px;"
+                data-direction="up">
+
+                <div style="flex: 1 1 300px; color: black;">
+                    <h2>📗 Grade 12 — Badminton Club President</h2>
+                    <p>Founding and leading the Badminton Club has been one of the most empowering and defining
+                        experiences of my high school career. As President, I had the opportunity to create a welcoming
+                        and structured space for over 100 students to share their love for the sport—whether they were
+                        seasoned players or complete beginners.
+
+
+                        What I enjoyed most was seeing the community come together. Watching students from different
+                        grades bond over rallies, improve their skills, and support each other during games was
+                        incredibly rewarding. Organizing an internal tournament with prizes was a highlight—seeing the
+                        excitement and competitive spirit in the gym made all the hard work worth it.
+
+
+                        The biggest challenges came early on. Starting a new club meant facing obstacles like finding a
+                        dedicated teacher sponsor, navigating school policies, and coordinating logistics such as
+                        equipment, fees, and liability forms. It was overwhelming at times, but it taught me to stay
+                        persistent and resourceful.
+
+
+                        I chose to start this club because I’m passionate about badminton, and I wanted to create a
+                        space where others could discover that same passion. I saw a gap in extracurricular offerings
+                        for this sport and knew there was a demand—I just needed to take initiative to make it happen.
+
+
+                        This experience taught me the value of leadership through service. I learned how to organize
+                        effectively, communicate clearly, and lead with inclusivity. Managing a large and diverse group
+                        improved my teamwork and adaptability, while the process of overcoming challenges strengthened
+                        my confidence and resilience. Most importantly, I discovered how powerful it is to build
+                        something from the ground up that brings people together and makes a lasting impact on the
+                        school community.
+                    </p>
+                    <h2>📗 Grade 12 — Senior Aquatic Instructor</h2>
+                    <p>
+                        What I enjoyed the most was forming connections with my swimmers. Helping someone overcome a
+                        fear of water, or seeing a child go from nervous to confident, gave me a deep sense of purpose.
+                        Every lesson was an opportunity to make a positive impact.
+
+                        The most challenging part was the journey to becoming certified. At 16, I had no experience and
+                        could barely swim 50 meters. I had to train multiple times a day for an entire summer to build
+                        the stamina and skill to pass the 400-meter swim test.
+
+                        I chose to become an aquatic instructor because I saw it as more than just a job—it was a way to
+                        empower others while pushing myself to grow. Teaching swimming required leadership, patience,
+                        and care, all qualities I wanted to build.
+
+                        This experience taught me that discipline and determination can break through any limit. It
+                        shaped me into a stronger, more compassionate leader and helped me understand how to adapt my
+                        teaching to different needs—whether it’s a toddler, a senior, or someone overcoming physical or
+                        psychological challenges.</p>
+                    <h2>📗 Grade 12 — Varsity Lacrosse (Year 3)</h2>
+                    <p>
+                        What I enjoyed the most in my third year of lacrosse was taking full ownership of my role as a
+                        veteran player. I wasn’t just helping rookies anymore—I was actively controlling the pace of the
+                        game, reading plays, and stepping up in key moments. Scoring two goals this season was a
+                        highlight, but the real reward came from knowing I had earned the trust of my teammates and
+                        coaches.
+
+                        The most challenging part was maintaining intensity and focus as the competition got tougher. As
+                        an experienced player, there’s an expectation to lead by example—whether through consistent
+                        performance, strategic play, or encouraging others. Balancing that leadership with my own growth
+                        required a higher level of discipline and awareness.
+
+                        I continued with lacrosse because the sport has become a defining part of my high school
+                        experience. It challenges me physically, mentally, and emotionally, and it’s taught me how to
+                        push through fatigue, adapt on the fly, and trust in my team.
+
+                        This year taught me that leadership isn’t just about guidance—it’s about accountability. I’ve
+                        learned how to be a calming presence under pressure, how to lift others when morale is low, and
+                        how to grow alongside a team rather than ahead of it. Every season reminds me that excellence
+                        comes from consistency, not just raw talent.</p>
+                    <h2>📗 Grade 12 — Varisty Badminton Team (Year 3)</h2>
+                    <p>
+                        What I enjoyed the most this season was the bond I built with my partner, Christina. We’d been
+                        training since the summer—on our own time, after school, and beyond team practices. That extra
+                        effort made our partnership stronger and our matches more synchronized. Even though we placed
+                        5th, the journey we shared was something I’ll never forget.
+
+                        The most challenging part was losing to our own teammates in the tournament. It was a tough
+                        moment emotionally—we had trained so hard, and falling short so close to the top made the loss
+                        sting even more. But it also reminded me that sports are about respect and growth, even in
+                        defeat.
+
+                        I returned to badminton for a third year because I love the blend of strategy, precision, and
+                        mental focus it demands. This year, I also wanted to commit to a partner and truly build
+                        chemistry and trust, which I was able to do with Christina.
+
+                        This experience taught me that preparation doesn’t always guarantee the outcome you want—but it
+                        does build resilience, sportsmanship, and pride in your work. It reminded me that progress isn’t
+                        only measured in placement, but in how far you’ve come from where you started.</p>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <img src="images/Screenshot 2025-05-29 at 6.40.35 AM.png" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+                    <img src="images/senior.jpeg" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+                    <img src="images/IMG_6538.PNG" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+                    <img src="images/bamditnon12.jpeg" alt="Grade 10 Image"
+                        style="border-radius: 16px; width: 100%; max-width: 300px;" />
+
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        function onClickMenu() {
+            document.getElementById("menu").classList.toggle("change");
+            document.getElementById("nav").classList.toggle("change");
+            document.getElementById("menu-bg").classList.toggle("change-bg");
+        }
+
+        $("#menu").click(function () {
+            $(".transform").toggleClass("transform-active");
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const panel = entry.target;
+                    const direction = panel.getAttribute("data-direction");
+                    panel.classList.remove("hidden"); // Remove the hidden class
+                    panel.classList.add(`panel-move-${direction}`); // Add the animation class
+                    observer.unobserve(panel); // Remove observer for this panel
+                }
+            });
+        });
+
+        const hiddenElements = document.querySelectorAll(".hidden");
+        hiddenElements.forEach((el) => {
+            observer.observe(el); // Start observing hidden panels
+        });
+
+        smoothScroll.init();
+    </script>
+</body>
+
+</html>
